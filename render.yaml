@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: sirse-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn sirse_api.main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sirse-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+
+databases:
+  - name: sirse-db
+    databaseName: sirse_db
+    user: sirse_user
