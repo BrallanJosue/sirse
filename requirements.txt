@@ -1,9 +1,8 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
-mysql-connector-python==8.2.0
-python-dotenv==1.0.0
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-pymysql==1.1.0
-pip freeze > requirements.txt
+fastapi
+uvicorn
+python-dotenv
+sqlalchemy
+psycopg2-binary
+pydantic
+jinja2
+python-multipart

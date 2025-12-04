@@ -1,8 +1,25 @@
+@"
+# Python
 __pycache__/
 *.pyc
-.env
-venv/
+*.pyo
+*.pyd
+.Python
 env/
-*.db
+venv/
+.venv/
+
+# FastAPI/UVicorn
 *.log
+
+# VSCode
+.vscode/
 .DS_Store
+
+# Vercel
+.vercel/
+
+# Archivos de entorno (NO subir credenciales)
+.env
+.env.local
+"@ | Out-File -Encoding UTF8 .gitignore

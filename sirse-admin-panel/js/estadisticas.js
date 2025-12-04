@@ -1,19 +1,37 @@
 let chartTendencias, chartTiempoRespuesta, chartResolucion, chartDepartamentos;
 
-// ==========================================
-//   LOAD ESTADISTICAS (VERSIÓN ACTUALIZADA)
-// ==========================================
+// ================================
+//   FETCH con manejo de 401
+// ================================
+async function authFetch(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...getAuthHeaders(),
+            ...(options.headers || {})
+        }
+    });
+
+    if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/index.html';
+        return null;
+    }
+
+    return response;
+}
+
+// ================================
+//   LOAD ESTADISTICAS
+// ================================
 async function loadEstadisticas() {
     try {
-        const statsResponse = await fetch(`${API_URL}/estadisticas/metricas-avanzadas`, {
-            headers: getAuthHeaders()
-        });
-
-        if (!statsResponse.ok) throw new Error("Error cargando métricas avanzadas");
+        const statsResponse = await authFetch(`${API_URL}/estadisticas/metricas-avanzadas`);
+        if (!statsResponse) return;
 
         const stats = await statsResponse.json();
 
-        // Datos reales del backend
         document.getElementById('tasa-resolucion').textContent = `${stats.tasa_resolucion}%`;
         document.getElementById('tiempo-respuesta').textContent = `${stats.tiempo_respuesta}h`;
         document.getElementById('satisfaccion').textContent = `${stats.satisfaccion}/5`;
@@ -31,19 +49,16 @@ async function loadEstadisticas() {
     }
 }
 
-// ==========================================
-//   LOAD CHARTS (VERSIÓN ACTUALIZADA)
-// ==========================================
+// ================================
+//   LOAD CHARTS
+// ================================
 async function loadCharts() {
     try {
-        // ---- TENDENCIAS REALES ----
-        const tendenciasResponse = await fetch(`${API_URL}/estadisticas/tendencias-semana`, {
-            headers: getAuthHeaders()
-        });
-
+        // ------- TENDENCIAS REALES ------
+        const tendenciasResponse = await authFetch(`${API_URL}/estadisticas/tendencias-semana`);
         let tendenciasData;
 
-        if (tendenciasResponse.ok) {
+        if (tendenciasResponse) {
             tendenciasData = await tendenciasResponse.json();
         } else {
             tendenciasData = {
@@ -85,11 +100,9 @@ async function loadCharts() {
             }
         });
 
-        // ----------------------------------------------------
-        //   GRÁFICOS RESTANTES (EJEMPLOS TEMPORALES)
-        // ----------------------------------------------------
-
-        // TIEMPO DE RESPUESTA
+        // ==============================
+        //   TIEMPO DE RESPUESTA
+        // ==============================
         const ctxTiempo = document.getElementById("chart-tiempo-respuesta").getContext("2d");
         if (chartTiempoRespuesta) chartTiempoRespuesta.destroy();
 
@@ -114,7 +127,9 @@ async function loadCharts() {
             }
         });
 
-        // TASA DE RESOLUCIÓN
+        // ==============================
+        //   TASA DE RESOLUCIÓN
+        // ==============================
         const ctxResolucion = document.getElementById("chart-resolucion").getContext("2d");
         if (chartResolucion) chartResolucion.destroy();
 
@@ -137,7 +152,9 @@ async function loadCharts() {
             }
         });
 
-        // DEPARTAMENTOS
+        // ==============================
+        //   DEPARTAMENTOS
+        // ==============================
         const ctxDept = document.getElementById("chart-departamentos").getContext("2d");
         if (chartDepartamentos) chartDepartamentos.destroy();
 
@@ -153,7 +170,12 @@ async function loadCharts() {
                 datasets: [{
                     label: "Atendidos / Recibidos",
                     data: [245, 198, 285, 236],
-                    backgroundColor: ["#ffd700", "#ff8c00", "#00d084", "#003366"],
+                    backgroundColor: [
+                        "#ffd700",
+                        "#ff8c00",
+                        "#00d084",
+                        "#003366"
+                    ],
                     borderRadius: 4
                 }]
             },
