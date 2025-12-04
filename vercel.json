@@ -1,9 +1,12 @@
 {
-    "version": 2,
     "builds": [
       {
         "src": "sirse_api/main.py",
         "use": "@vercel/python"
+      },
+      {
+        "src": "sirse-admin-panel/**",
+        "use": "@vercel/static"
       }
     ],
     "routes": [
@@ -13,7 +16,11 @@
       },
       {
         "src": "/(.*)",
-        "dest": "/sirse-admin-panel/$1"
+        "dest": "sirse-admin-panel/$1"
+      },
+      {
+        "src": "/",
+        "dest": "sirse-admin-panel/index.html"
       }
     ]
   }
